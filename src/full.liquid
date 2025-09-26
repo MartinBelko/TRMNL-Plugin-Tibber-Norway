@@ -1,0 +1,103 @@
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/pattern-fill.js"></script>
+
+<style>
+  #container {
+    margin-top: 15px;
+    height: calc(100% - 40px);
+  }
+</style>
+
+<div id="container"></div>
+
+<div class="title_bar">
+  <img style="filter:invert(1)" class="image" src="https://framerusercontent.com/images/DNNK7k8uF1jZfKCEo6XoZd3Yc.svg">
+  <span class="title" style="color:#000;">Tibber Norway</span>
+  <span class="instance" style="color:#000;">Price Today</span>
+</div>
+
+<script>
+  const priceData = {{ energy.todayHours | json }};
+
+  const data = priceData.map(item => [item.hour, item.priceIncludingVat * 100]);
+
+  Highcharts.chart('container', {
+    chart: {
+      type: 'line',
+      backgroundColor: 'transparent',
+      style: {
+        fontFamily: 'NicoPups'
+      }
+    },
+    title: {
+      text: null
+    },
+    credits: {
+      enabled: false
+    },
+    legend: {
+      enabled: false
+    },
+    xAxis: {
+      type: 'category',
+      title: {
+        text: 'Time (Hour)',
+        style: {
+          color: '#000',
+          fontSize: "24px"
+        }
+      },
+      labels: {
+        style: {
+          color: '#000',
+          fontSize: '16px'
+        }
+      },
+      tickInterval: 1,
+      lineColor: '#000',
+      gridLineDashStyle: "dot",
+      gridLineWidth: 1,
+      gridLineColor: '#000',
+    },
+    yAxis: {
+      title: {
+        text: 'Price (Øre)',
+        style: {
+          color: '#000',
+          fontSize: "24px"
+        }
+      },
+      labels: {
+        style: {
+          color: '#000',
+          fontSize: '18px'
+        }
+      },
+      gridLineColor: '#000',
+      gridLineWidth: 1.5,
+      gridLineDashStyle: "shortdot"
+    },
+    tooltip: {
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      borderColor: '#ccc',
+      style: {
+        color: '#333333'
+      },
+      formatter: function() {
+        return '<b>Hour ' + this.x + '</b><br/>' + this.y.toFixed(2) + ' Øre';
+      }
+    },
+    series: [{
+      animation: false,
+      lineWidth: 2.5,
+      name: 'Price',
+      data: data,
+      color: '#000',
+      step: 'center',
+      marker: {
+        enabled: false
+      }
+    }]
+  });
+</script>

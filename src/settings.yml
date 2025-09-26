@@ -1,0 +1,23 @@
+---
+strategy: polling
+no_screen_padding: 'no'
+dark_mode: 'no'
+static_data: ''
+polling_verb: get
+polling_url: https://tibber.com/no/api/lookup/price-overview?postalCode={{postal_code}}
+polling_headers: ''
+polling_body: ''
+id: 135286
+custom_fields:
+- keyname: author_bio
+  name: About This Plugin
+  field_type: author_bio
+  description: Electricity price chart for today, for Norwegian homes using Tibber.
+- keyname: postal_code
+  field_type: number
+  name: Postal Code
+  description: The Norwegian postal code from where to get the electricity cost.
+  help_text: Must be a 4 digit number
+  placeholder: 4625
+name: Tibber Norway
+refresh_interval: 1440
