@@ -1,0 +1,6 @@
+watch:
+  - .trmnlp.yml
+  - src
+
+custom_fields:
+  postal_code: "4625"
