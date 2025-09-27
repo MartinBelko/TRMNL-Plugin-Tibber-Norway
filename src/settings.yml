@@ -13,6 +13,7 @@ custom_fields:
   name: About This Plugin
   field_type: author_bio
   description: Electricity price chart for today, for Norwegian homes using Tibber.
+  github_url: https://github.com/MartinBelko/TRMNL-Plugin-Tibber-Norway
 - keyname: postal_code
   field_type: number
   name: Postal Code
