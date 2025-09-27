@@ -3,6 +3,8 @@ Plugin for TRMNL e-inc Dashboard Display to show hourly price throughout the day
 
 An version is up and published, but i it is a work in progress to include some features once i have time.
 
+Link to recipe on [usetrmnl.com](https://usetrmnl.com/recipes/135286/)
+
 ![preview full](assets/full.png)
 
 
