@@ -1,97 +1,152 @@
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/highcharts-more.js"></script>
-<script src="https://code.highcharts.com/modules/pattern-fill.js"></script>
+{% comment %} ---- Pre-compute all data in Liquid ---- {% endcomment %}
+{% assign max_price = -1 %}
+{% assign min_price = 999999 %}
+{% assign max_hour = 0 %}
+{% assign min_hour = 0 %}
+
+{% for item in energy.todayHours %}
+  {% assign ore = item.priceIncludingVat | times: 100.0 %}
+  {% if ore > max_price %}
+    {% assign max_price = ore %}
+    {% assign max_hour = item.hour %}
+  {% endif %}
+  {% if ore < min_price %}
+    {% assign min_price = ore %}
+    {% assign min_hour = item.hour %}
+  {% endif %}
+{% endfor %}
+
+{% assign max_display = max_price | round: 1 %}
+{% assign min_display = min_price | round: 1 %}
+
+<script src="https://trmnl.com/js/highcharts/12.3.0/highcharts.js"></script>
 
 <style>
-  #container {
-    margin-top: 25px;
-    height: calc(100% - 40px);
+  .hh-wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+  }
+  .hh-sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    min-width: 130px;
+    max-width: 155px;
+    border-right: 2px solid #000;
+  }
+  .hh-chart {
+    flex: 1;
+    min-width: 0;
+  }
+  #chart-container {
+    width: 100%;
+    height: 100%;
   }
 </style>
 
-<div id="container"></div>
+<div class="hh-wrapper">
+
+  <div class="hh-sidebar">
+    <div class="item">
+      <div class="meta">
+        <span class="index">▲</span>
+      </div>
+      <div class="content">
+        <span class="value value--xsmall" data-value-fit="true">{{ max_display }} Øre</span>
+        <span class="label label--small">@ {{ max_hour }}:00</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="item">
+      <div class="meta">
+        <span class="index">▼</span>
+      </div>
+      <div class="content">
+        <span class="value value--xsmall" data-value-fit="true">{{ min_display }} Øre</span>
+        <span class="label label--small">@ {{ min_hour }}:00</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hh-chart">
+    <div id="chart-container"></div>
+  </div>
+
+</div>
+
+<div class="title_bar">
+  <img style="filter:invert(1)" class="image" src="https://framerusercontent.com/images/DNNK7k8uF1jZfKCEo6XoZd3Yc.svg">
+  <span class="title">Tibber Norway</span>
+  <span class="instance">Price Today (øre/kWh)</span>
+</div>
 
 <script>
-  const priceData = {{ energy.todayHours | json }};
+  var data = [
+    {% for item in energy.todayHours %}
+      {% assign ore = item.priceIncludingVat | times: 100.0 | round: 2 %}
+      {
+        name: "{{ item.hour }}",
+        y: {{ ore }},
+        {% if item.hour == max_hour %}
+          color: "#999999"
+        {% elsif item.hour == min_hour %}
+          color: "#999999"
+        {% else %}
+          color: "#ffffff"
+        {% endif %}
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ];
 
-  const data = priceData.map(item => [item.hour, item.priceIncludingVat * 100]);
-
-  Highcharts.chart('container', {
+  Highcharts.chart("chart-container", {
     chart: {
-      type: 'line',
-      backgroundColor: 'transparent',
-      style: {
-        fontFamily: 'NicoPups'
-      }
+      type: "column",
+      backgroundColor: "transparent",
+      style: { fontFamily: "NicoPups" }
     },
-    title: {
-      text: null
-    },
-    credits: {
-      enabled: false
-    },
-    legend: {
-      enabled: false
-    },
+    title: { text: null },
+    credits: { enabled: false },
+    legend: { enabled: false },
     xAxis: {
-      type: 'category',
-      title: {
-        text: 'Time (Hour)',
-        style: {
-          color: '#000',
-          fontSize: "20px"
-        }
-      },
-      labels: {
-        style: {
-          color: '#000',
-          fontSize: '16px'
-        }
-      },
-      tickInterval: 1,
-      lineColor: '#000',
+      type: "category",
+      title: { text: null },
+      labels: { style: { color: "#000", fontSize: "16px" } },
+      lineColor: "#000",
       gridLineDashStyle: "dot",
       gridLineWidth: 1,
-      gridLineColor: '#000',
+      gridLineColor: "#000"
     },
     yAxis: {
-      title: {
-        text: 'Price (Øre)',
-        style: {
-          color: '#000',
-          fontSize: "20px"
-        }
-      },
-      labels: {
-        style: {
-          color: '#000',
-          fontSize: '18px'
-        }
-      },
-      gridLineColor: '#000',
-      gridLineWidth: 1.5,
+      title: { text: null },
+      labels: { style: { color: "#000", fontSize: "16px" } },
+      gridLineColor: "#000",
+      gridLineWidth: 1,
       gridLineDashStyle: "shortdot"
     },
+    plotOptions: {
+      column: {
+        animation: false,
+        borderColor: "#000000",
+        borderWidth: 1.5,
+        pointPadding: 0.02,
+        groupPadding: 0.02
+      }
+    },
     tooltip: {
-      backgroundColor: 'rgba(255, 255, 255, 0.9)',
-      borderColor: '#ccc',
-      style: {
-        color: '#333333'
-      },
       formatter: function() {
-        return '<b>Hour ' + this.x + '</b><br/>' + this.y.toFixed(2) + ' Øre';
+        return "<b>Hour " + this.point.name + "</b><br/>" + this.y.toFixed(2) + " Øre";
       }
     },
     series: [{
-      animation: false,
-      lineWidth: 2.5,
-      name: 'Price',
-      data: data,
-      color: '#000',
-      step: 'center',
-      marker: {
-        enabled: false
-      }
+      name: "Price",
+      colorByPoint: true,
+      data: data
     }]
   });
 </script>
